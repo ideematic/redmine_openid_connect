@@ -22,7 +22,7 @@ module RedmineOpenidConnect
     rescue ActiveRecord::RecordNotFound => e
       redirect_to oic_local_logout_url
     end
-    
+
     # performs redirect to SSO server
     def oic_login
       if session[:oic_session_id].blank?
@@ -93,7 +93,7 @@ module RedmineOpenidConnect
         if user.nil?
           if !OicSession.create_user_if_not_exists?
             flash.now[:warning] ||= l(:oic_cannot_create_user, value: user_info["email"])
-            
+
             logger.warn "Could not create user #{user_info["email"]}, the system is not allowed to create new users through openid"
             flash.now[:warning] += "The system is not allowed to create new users through openid"
 
@@ -104,8 +104,8 @@ module RedmineOpenidConnect
 
           user.login = user_info["user_name"] || user_info["nickname"] || user_info["preferred_username"] || user_info["email"]
 
-          firstname = user_info["given_name"]
-          lastname = user_info["family_name"]
+          firstname = user_info["given_name"] || user_info["givenName"]
+          lastname = user_info["family_name"] || user_info["sn"]
 
           if (firstname.nil? || lastname.nil?) && user_info["name"]
             parts = user_info["name"].split
